@@ -399,13 +399,14 @@ class BotHandlers:
     def _custody_notice_text(self) -> str:
         return (
             '信鸽账号托管须知\n\n'
-            '信鸽是 TBaaS 旗下产品，用来连接你的 Telegram 账号，并按你设置的目标、模板和时间自动发送消息。\n\n'
+            '信鸽是 TBaaS 旗下开源项目，用来连接你的 Telegram 账号，并按你设置的目标、模板和时间自动发送消息。\n\n'
             '使用前请了解：\n\n'
             '1. 登录后，信鸽会保存一份加密的 Telegram 登录状态，用来执行你创建的发送任务。\n'
             '2. 信鸽不会保存你的验证码或 2FA 密码；这些信息只用于当次登录。\n'
             '3. 你可以随时在信鸽里断开账号，也可以在 Telegram 设置 → 设备 中移除这次登录。\n'
-            '4. 频繁发送消息可能触发 Telegram 风控，请只向你有权限联系或管理的目标发送。\n\n'
-            '官方频道：@TBaaS_cc'
+            '4. 请只向你有权限联系或管理的目标发送消息；频繁发送可能触发 Telegram 风控。\n\n'
+            '官方频道：@TBaaS_cc\n'
+            '开源地址：https://github.com/WocBoss/xinge-broadcast-bot'
         )
 
     async def _home_view(self, user_id: int) -> tuple[str, InlineKeyboardMarkup]:
