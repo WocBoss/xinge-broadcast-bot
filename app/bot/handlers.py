@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, Update
 from telegram.ext import ContextTypes
-import qrcode
-import tempfile
-from pathlib import Path
 
-from app.bot.keyboards import back_keyboard, confirm_keyboard, home_keyboard, login_method_keyboard, phone_login_keyboard, qr_login_keyboard, rule_examples_keyboard
+from app.bot.keyboards import back_keyboard, confirm_keyboard, home_keyboard, login_method_keyboard, phone_login_keyboard, rule_examples_keyboard
 from app.config import settings
 from app.repositories.user_profiles import UserProfileRepo
 from app.services.account_session_service import AccountSessionService
@@ -102,36 +99,12 @@ class BotHandlers:
             await self._edit(query.message, '选择登录方式', self._login_method_keyboard())
             return
 
-        if action == 'qr_login':
-            session, qr_url = await self.account_sessions.begin_qr_login(user_id)
-            if not qr_url:
-                await self._edit(query.message, self._connect_account_text(session), self._home_keyboard())
-                return
-            qr_path = self._make_qr_image(user_id, qr_url)
-            await self._edit(
-                query.message,
-                '双设备扫码登录\n\n请用另一台已登录 Telegram 的设备扫码确认登录。\n\n扫码确认后回到这里，点「我已确认登录」。',
-                self._qr_login_keyboard(),
-            )
-            with qr_path.open('rb') as qr_file:
-                await query.message.reply_photo(photo=qr_file, caption='扫码登录 Telegram 账号。二维码短时间内有效。')
-            qr_path.unlink(missing_ok=True)
-            return
-
         if action == 'phone_login':
             await self._edit(
                 query.message,
                 '单设备手机号登录\n\n点击下面按钮打开 Mini App 登录页。\n验证码和 2FA 密码只在网页里输入，不要发到 Telegram 聊天。',
                 phone_login_keyboard(f'{settings.webhook_base_url.rstrip("/")}/login?m={query.message.message_id}'),
             )
-            return
-
-        if action == 'confirm_qr_login':
-            try:
-                session = await self.account_sessions.confirm_qr_login(user_id)
-                await self._edit(query.message, f'账号已连接：{session.display_name or session.phone or "Telegram 账号"}', self._home_keyboard(True))
-            except Exception as e:
-                await self._edit(query.message, f'{e}', self._qr_login_keyboard())
             return
 
         if action == 'disconnect_account':
@@ -570,9 +543,6 @@ class BotHandlers:
     def _login_method_keyboard(self) -> InlineKeyboardMarkup:
         return login_method_keyboard()
 
-    def _qr_login_keyboard(self) -> InlineKeyboardMarkup:
-        return qr_login_keyboard()
-
     def _template_saved_keyboard(self, template_id: int) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup([
             [InlineKeyboardButton('预览', callback_data=f'preview:{template_id}'), InlineKeyboardButton('编辑', callback_data=f'edit_template:{template_id}')],
@@ -629,26 +599,6 @@ class BotHandlers:
             '• 每2小时\n\n'
             '时间按 Asia/Shanghai 处理'
         )
-
-    def _connect_account_text(self, session) -> str:
-        if session.status == 'blocked':
-            return (
-                '连接账号暂不可用。\n\n'
-                f'{session.last_error}\n\n'
-                '下一步需要在服务端配置 Telegram API ID/API Hash，并接入 TDLib/Telethon 登录流程。'
-            )
-        return (
-            '账号托管 QR 登录\n\n'
-            'QR 登录本质是登录一个新的 Telegram 客户端设备。\n'
-            '我们不会接收你的密码或验证码，但登录成功后服务端会持有加密 session，用于按任务自动发送。\n\n'
-            '安全措施：session 加密保存；可随时断开账号；公开关键代码后重点公开登录态保存和发送边界。'
-        )
-
-    def _make_qr_image(self, user_id: int, qr_url: str) -> Path:
-        path = Path(tempfile.gettempdir()) / f'xinge_qr_{user_id}.png'
-        img = qrcode.make(qr_url)
-        img.save(path)
-        return path
 
     def _target_saved_text(self, target) -> str:
         return (

@@ -16,8 +16,7 @@ def home_keyboard(*, connected: bool) -> InlineKeyboardMarkup:
 
 def login_method_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton('双设备扫码登录', callback_data='qr_login')],
-        [InlineKeyboardButton('单设备手机号登录', callback_data='phone_login')],
+        [InlineKeyboardButton('手机号登录', callback_data='phone_login')],
         [InlineKeyboardButton('返回首页', callback_data='home')],
     ])
 
@@ -25,14 +24,6 @@ def login_method_keyboard() -> InlineKeyboardMarkup:
 def phone_login_keyboard(url: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton('打开登录页', web_app=WebAppInfo(url=url))],
-        [InlineKeyboardButton('返回首页', callback_data='home')],
-    ])
-
-
-def qr_login_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton('我已确认登录', callback_data='confirm_qr_login')],
-        [InlineKeyboardButton('重新生成二维码', callback_data='connect_account')],
         [InlineKeyboardButton('返回首页', callback_data='home')],
     ])
 
