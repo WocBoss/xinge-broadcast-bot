@@ -11,6 +11,13 @@ SCHEMA_SQL = """
 PRAGMA journal_mode=WAL;
 PRAGMA foreign_keys=ON;
 
+CREATE TABLE IF NOT EXISTS user_profiles (
+    owner_user_id INTEGER PRIMARY KEY,
+    notice_seen_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS account_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     owner_user_id INTEGER NOT NULL UNIQUE,
@@ -85,6 +92,7 @@ CREATE TABLE IF NOT EXISTS send_logs (
     FOREIGN KEY(target_id) REFERENCES targets(id) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS idx_user_profiles_notice ON user_profiles(notice_seen_at);
 CREATE INDEX IF NOT EXISTS idx_account_sessions_owner ON account_sessions(owner_user_id);
 CREATE INDEX IF NOT EXISTS idx_targets_owner ON targets(owner_user_id);
 CREATE INDEX IF NOT EXISTS idx_templates_owner ON message_templates(owner_user_id);
