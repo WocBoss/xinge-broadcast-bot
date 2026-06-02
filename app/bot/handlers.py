@@ -339,14 +339,11 @@ class BotHandlers:
         if not template_id:
             await message.reply_text('编辑状态已失效。', reply_markup=self._home_keyboard())
             return
-        if not text:
-            await message.reply_text('目前只支持把模板编辑为文字内容。媒体模板请删除后重新保存。', reply_markup=self._back_keyboard(f'template:{template_id}'))
-            return
         try:
-            template = await self.templates.update_text(user_id, template_id, text)
+            template = await self.templates.update_from_message(user_id, template_id, message)
             self.waiting.pop(user_id, None)
             self.editing_template.pop(user_id, None)
-            await self._edit_state_message(message, user_id, f'模板 #{template.id} 已更新。', self._template_saved_keyboard(template.id))
+            await self._edit_state_message(user_id=user_id, message=message, text=f'模板 #{template.id} 已更新。', keyboard=self._template_saved_keyboard(template.id))
         except Exception as e:
             await self._edit_state_message(message, user_id, f'更新模板失败：{e}', self._back_keyboard(f'template:{template_id}'))
 

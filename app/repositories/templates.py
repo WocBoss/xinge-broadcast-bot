@@ -59,18 +59,32 @@ class TemplateRepo:
             )
             return [self._map(r) for r in await cur.fetchall()]
 
-    async def update_text(self, template_id: int, owner_user_id: int, text: str) -> MessageTemplate | None:
+    async def update_from_message(self, template_id: int, owner_user_id: int, payload: dict[str, Any]) -> MessageTemplate | None:
+        message_type = payload.get('message_type', 'message')
         async with get_db() as db:
-            await db.execute(
+            cur = await db.execute(
                 """
                 UPDATE message_templates SET
-                    message_type='text', text=?, caption=NULL, raw_message_json=?, media_json='{}',
-                    entities_json='[]', caption_entities_json='[]', updated_at=CURRENT_TIMESTAMP
+                    message_type=?, raw_message_json=?, text=?, entities_json=?, media_json=?,
+                    caption=?, caption_entities_json=?, reply_markup_json=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=? AND owner_user_id=?
                 """,
-                (text, dumps({'message_type': 'text', 'text': text}), template_id, owner_user_id),
+                (
+                    message_type,
+                    dumps(payload),
+                    payload.get('text'),
+                    dumps(payload.get('entities') or []),
+                    dumps(payload.get('media') or {}),
+                    payload.get('caption'),
+                    dumps(payload.get('caption_entities') or []),
+                    dumps(payload.get('reply_markup') or {}),
+                    template_id,
+                    owner_user_id,
+                ),
             )
             await db.commit()
+            if cur.rowcount <= 0:
+                return None
         return await self.get(template_id)
 
     async def delete(self, template_id: int, owner_user_id: int) -> bool:

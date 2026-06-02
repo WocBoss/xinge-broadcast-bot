@@ -137,6 +137,12 @@ class AccountSenderService:
         if entity_type == 'text_link':
             url = entity.get('url')
             return types.MessageEntityTextUrl(offset=offset, length=length, url=url) if url else None
+        if entity_type == 'text_mention':
+            user = entity.get('user') or {}
+            user_id = user.get('id')
+            return types.MessageEntityMentionName(offset=offset, length=length, user_id=int(user_id)) if user_id else None
+        if entity_type == 'blockquote':
+            return types.MessageEntityBlockquote(offset=offset, length=length)
         if entity_type == 'url':
             return types.MessageEntityUrl(offset=offset, length=length)
         if entity_type == 'email':
