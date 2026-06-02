@@ -14,6 +14,13 @@ def home_keyboard(*, connected: bool) -> InlineKeyboardMarkup:
     ])
 
 
+def custody_notice_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton('我已了解，继续', callback_data='accept_custody_notice')],
+        [InlineKeyboardButton('返回首页', callback_data='home')],
+    ])
+
+
 def login_method_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
         [InlineKeyboardButton('双设备扫码登录', callback_data='qr_login')],

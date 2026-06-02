@@ -6,7 +6,7 @@ import qrcode
 import tempfile
 from pathlib import Path
 
-from app.bot.keyboards import back_keyboard, confirm_keyboard, home_keyboard, login_method_keyboard, phone_login_keyboard, qr_login_keyboard, rule_examples_keyboard
+from app.bot.keyboards import back_keyboard, confirm_keyboard, custody_notice_keyboard, home_keyboard, login_method_keyboard, phone_login_keyboard, qr_login_keyboard, rule_examples_keyboard
 from app.config import settings
 from app.services.account_session_service import AccountSessionService
 from app.services.preview_service import PreviewService
@@ -89,6 +89,15 @@ class BotHandlers:
             return
 
         if action == 'connect_account':
+            session = await self.account_sessions.get_session(user_id)
+            if session and session.status == 'connected':
+                await self._edit(query.message, f'账号已连接：{session.display_name or session.phone or "Telegram 账号"}', self._home_keyboard(True))
+                return
+            self._clear_state(user_id)
+            await self._edit(query.message, self._custody_notice_text(), self._custody_notice_keyboard())
+            return
+
+        if action == 'accept_custody_notice':
             session = await self.account_sessions.get_session(user_id)
             if session and session.status == 'connected':
                 await self._edit(query.message, f'账号已连接：{session.display_name or session.phone or "Telegram 账号"}', self._home_keyboard(True))
@@ -418,6 +427,19 @@ class BotHandlers:
         except Exception as e:
             await self._edit_state_message(message, user_id, f'修改失败：{e}', self._rule_examples_keyboard(prefix=f'update_rule:{task_id}:', back_to=f'task:{task_id}'))
 
+    def _custody_notice_text(self) -> str:
+        return (
+            '信鸽账号托管须知\n\n'
+            '信鸽是 TBaaS 旗下产品，用来连接你的 Telegram 账号，并按你设置的目标、模板和时间自动发送消息。\n\n'
+            '继续前请确认：\n\n'
+            '1. 登录后，信鸽会保存一份加密的 Telegram 登录状态，用来执行你创建的发送任务。\n'
+            '2. 信鸽不会保存你的验证码或 2FA 密码；这些信息只用于当次登录。\n'
+            '3. 你可以随时在信鸽里断开账号，也可以在 Telegram 设置 → 设备 中移除这次登录。\n'
+            '4. 频繁发送消息可能触发 Telegram 风控，请只向你有权限联系或管理的目标发送。\n\n'
+            '官方频道：@TBaaS_cc\n\n'
+            '如果你接受以上说明，再继续连接账号。'
+        )
+
     async def _home_view(self, user_id: int) -> tuple[str, InlineKeyboardMarkup]:
         session = await self.account_sessions.get_session(user_id)
         if session and session.status == 'connected':
@@ -549,6 +571,9 @@ class BotHandlers:
 
     def _home_keyboard(self, connected: bool = False) -> InlineKeyboardMarkup:
         return home_keyboard(connected=connected)
+
+    def _custody_notice_keyboard(self) -> InlineKeyboardMarkup:
+        return custody_notice_keyboard()
 
     def _login_method_keyboard(self) -> InlineKeyboardMarkup:
         return login_method_keyboard()
