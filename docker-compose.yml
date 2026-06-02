@@ -1,0 +1,12 @@
+services:
+  xinge:
+    build: .
+    container_name: xinge-broadcast-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3510:3510"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs

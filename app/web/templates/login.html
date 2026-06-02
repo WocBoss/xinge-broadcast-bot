@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="static/login.css" />
+  <title>信鸽账号登录</title>
+</head>
+<body>
+  <main class="card">
+    <h1>单设备手机号登录</h1>
+    <p class="description">
+      验证码和 2FA 密码只在这个页面输入，不要发到 Telegram 聊天里。
+      登录成功后，信鸽只保存加密后的账号登录态。
+    </p>
+
+    <section id="step-phone">
+      <label for="phone">手机号</label>
+      <input id="phone" placeholder="+8613800000000" autocomplete="tel" />
+      <button type="button" onclick="sendCode()">发送验证码</button>
+    </section>
+
+    <section id="step-code" hidden>
+      <label for="code">Telegram 登录验证码</label>
+      <input id="code" placeholder="12345" inputmode="numeric" autocomplete="one-time-code" />
+      <button type="button" onclick="submitCode()">确认验证码</button>
+    </section>
+
+    <section id="step-password" hidden>
+      <label for="password">2FA 密码</label>
+      <input id="password" type="password" autocomplete="current-password" />
+      <button type="button" onclick="submitPassword()">确认密码</button>
+    </section>
+
+    <p id="message" class="message"></p>
+  </main>
+
+  <script src="static/login.js"></script>
+</body>
+</html>

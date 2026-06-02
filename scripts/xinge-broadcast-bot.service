@@ -1,0 +1,15 @@
+[Unit]
+Description=Xinge Account Broadcast Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/xinge-broadcast-bot
+ExecStart=/opt/xinge-broadcast-bot/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

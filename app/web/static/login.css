@@ -1,0 +1,72 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --text: #111111;
+  --muted: #555555;
+  --border: #dddddd;
+  --primary: #2aabee;
+  --danger: #b00020;
+  --ok: #137333;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.description,
+.message {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 14px;
+  color: #333333;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  font-size: 16px;
+}
+
+button:disabled { opacity: 0.55; }
+
+.message.error { color: var(--danger); }
+.message.ok { color: var(--ok); }
